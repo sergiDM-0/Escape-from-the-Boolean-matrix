@@ -7,37 +7,44 @@ Aplicativo para matrices relacionales **n×n**, análisis de propiedades (reflex
 ## Requisitos
 
 - **Python 3.10+** instalado en el sistema.
-- Archivo **[dependencias](dependencias)** en la raíz del proyecto (lista para `pip`).
+- Archivo **[v1.0/dependencias](v1.0/dependencias)** (lista para `pip`).
 
 ## Instalación
 
-En la carpeta del proyecto (recomendado usar entorno virtual):
+El entorno virtual **`.venv`** debe crearse en la **raíz del repositorio** (no dentro de `v1.0/`):
 
 ```bash
+cd /ruta/a/Matematicas_Discretas_Final
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install -r dependencias
+pip install -r v1.0/dependencias
 ```
 
 En Windows (PowerShell):
 
 ```powershell
+cd C:\ruta\a\Matematicas_Discretas_Final
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install --upgrade pip
-pip install -r dependencias
+pip install -r v1.0\dependencias
 ```
 
 ## Ejecución (modo desarrollo)
 
-Desde la raíz del proyecto, cuando exista el punto de entrada:
+Con la `.venv` activada, desde la raíz del proyecto:
 
 ```bash
-python main.py
+python v1.0/main.py
 ```
 
-(Sustituir `main.py` por el nombre real del archivo principal si difiere.)
+O bien:
+
+```bash
+cd v1.0
+python main.py
+```
 
 ## Uso esperado de la aplicación
 
@@ -51,17 +58,18 @@ python main.py
 
 ## Generar ejecutable (entrega)
 
-Con PyInstaller (ajusta el nombre del script principal):
+Con PyInstaller (desde la raíz, con `.venv` activada):
 
 ```bash
-pyinstaller --onefile --windowed main.py
+cd v1.0
+pyinstaller --onefile main.py
 ```
 
 La opción `--windowed` evita consola extra si la UI es solo ventanas; si tu aplicación es **solo consola**, omite `--windowed`. Revisa la carpeta `dist/` para el binario y pruébalo en un equipo **sin** el proyecto ni el IDE.
 
 ## Problemas frecuentes
 
-- **`pip` no encuentra `dependencias`:** ejecuta el comando desde la carpeta donde está el archivo `dependencias` o usa la ruta completa: `pip install -r /ruta/al/proyecto/dependencias`.
+- **`pip` no encuentra `dependencias`:** usa la ruta desde la raíz del repo: `pip install -r v1.0/dependencias`.
 - **Matplotlib no muestra ventana:** en algunos Linux hace falta backend; si ocurre, consulta la documentación de Matplotlib para tu sistema o guarda figura a archivo (`savefig`) como alternativa temporal.
 - **Grafo ilegible con n grande:** reduce **n** o amplía figura (`figsize`) y prueba otro layout (`spring_layout`, `kamada_kawai_layout`).
 
