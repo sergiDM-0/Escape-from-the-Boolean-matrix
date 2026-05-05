@@ -1,7 +1,8 @@
 # Plan v1.2 — Proyecto final Matemáticas Discretas (Relaciones y grafos)
 
-**Versión:** 1.2  
-**Cambios respecto a v1.0:** Lenguaje fijado en **Python 3**; archivo **[dependencias](dependencias)** con el conjunto completo de paquetes para runtime + empaquetado; sección dedicada a **matrices booleanas** (tipo y operaciones) frente a la entrada numérica 0/1; referencias Web; **manual de uso (README)** al final.
+**Versión:** 1.2 (actualizado en este mismo documento; **no** se modifica [Plan v1.0.md](Plan%20v1.0.md))  
+**Cambios respecto a v1.0:** Lenguaje fijado en **Python 3**; archivo de dependencias para `pip`; sección de **matrices booleanas**; referencias Web; manual al final.  
+**Actualizaciones en v1.2 (stack):** visualización del grafo con **Plotly** (no Matplotlib); **sin cota superior fija** para el orden **n** de la matriz (solo entero **n ≥ 1**; el límite real es memoria **O(n²)** y rendimiento al dibujar o al ingresar datos a mano).
 
 **Fuente de requisitos:** [Proyecto_Final_M.D..pdf](Proyecto_Final_M.D..pdf) (UNIVERSIDAD ECCI).
 
@@ -16,7 +17,7 @@
 - Implementar reflexiva, irreflexiva, simétrica, asimétrica, antisimétrica, transitiva y equivalencia (normativa f base)
 - Implementar orden parcial, total y estricto; documentar definiciones en informe (normativa f)
 - Menú: analizar todas las propiedades o una por una (normativa e)
-- Grafo dirigido con **NetworkX** + dibujo **Matplotlib** (normativa g)
+- Grafo dirigido: **NetworkX** (topología y `spring_layout`) + **Plotly** (`graph_objects`, figura interactiva; p. ej. `fig.show()`) (normativa g)
 - Ejecutable con **PyInstaller**; informe, manual y `.zip` de entrega
 
 ---
@@ -29,8 +30,8 @@ Todo el conjunto de paquetes externos del proyecto está listado **únicamente**
 | Paquete         | Rol en el proyecto                                                                                                                                                                                                                                                                                        |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **numpy**       | Matriz relacional como `ndarray` `**dtype=bool`**; producto matricial booleano para transitividad / composición; validación vectorizada.                                                                                                                                                                  |
-| **networkx**    | Construir `**DiGraph`** desde la matriz de adyacencia booleana; layouts para visualización. API recomendada: `nx.from_numpy_array(..., create_using=nx.DiGraph)` ([documentación NetworkX](https://networkx.org/documentation/stable/reference/generated/networkx.convert_matrix.from_numpy_array.html)). |
-| **matplotlib**  | Mostrar el grafo en pantalla (`plt.show()`), flechas dirigidas, etiquetas de nodos ([ejemplo grafos dirigidos](https://networkx.org/documentation/stable/auto_examples/drawing/plot_directly.html)).                                                                                                      |
+| **networkx**    | Construir `**DiGraph`** desde la matriz de adyacencia booleana; calcular posiciones (p. ej. `spring_layout`). API: `nx.from_numpy_array(..., create_using=nx.DiGraph)` ([documentación NetworkX](https://networkx.org/documentation/stable/reference/generated/networkx.convert_matrix.from_numpy_array.html)). |
+| **plotly**      | Visualización interactiva del digrafo (`graph_objects`, `fig.show()`; suele abrirse el navegador). **No** usar Matplotlib en la implementación alineada a este plan. [Plotly Python](https://plotly.com/python/).                                                                                         |
 | **pyinstaller** | Generar **ejecutable** para la entrega (“aplicación funcional” del PDF).                                                                                                                                                                                                                                  |
 
 
@@ -87,7 +88,7 @@ Referencia teórica sobre **multiplicación booleana** y **cierre transitivo** e
 | **e**     | Menú: todas las propiedades **o** una a una.                                                                                              |
 | **f**     | Salida sí/no: reflexiva, irreflexiva, simétrica, asimétrica, antisimétrica, transitiva, equivalencia; órdenes parcial / total / estricto. |
 | **g**     | Grafo dirigido **dibujado** en pantalla (no solo lista de aristas).                                                                       |
-| **h**     | Validar n, forma de matriz, símbolos de entrada y argumentos de funciones.                                                                |
+| **h**     | Validar n (entero **≥ 1**, sin tope fijo en código), forma de matriz, símbolos de entrada y argumentos de funciones.                         |
 
 
 ### Definiciones a codificar (alinear con tu clase)
@@ -116,7 +117,7 @@ flowchart TD
   menu[Menu propiedades: todas o una]
   props[Modulo propiedades sobre ndarray bool]
   order[Modulo orden parcial total estricto]
-  graph[NetworkX plus Matplotlib]
+  graph[NetworkX layout plus Plotly Figure]
   input --> validate --> pairs --> menu
   menu --> props --> order
   pairs --> graph
@@ -124,10 +125,10 @@ flowchart TD
 
 
 
-- `**matrix_io.py`:** lectura 0/1 → `np.bool`, aleatorio `np.random.random` + umbral o `random.choice`, validaciones.
+- `**matrix_io.py`:** lectura 0/1 → `bool`/`np.bool_`, aleatorio, validaciones; **n** solo validado como entero **≥ 1** (sin tope máximo en código).
 - `**relation.py`:** extracción de pares, cada propiedad, producto booleano auxiliar.
 - `**order.py`:** composición de órdenes.
-- `**graph_view.py`:** `from_numpy_array` → `DiGraph` → `draw_networkx_*`.
+- `**graph_view.py`:** `from_numpy_array` → `DiGraph` → layout NX → construir figura **Plotly** (trazas + opcional flechas por arista).
 - `**main.py`:** menú consola (o GUI opcional más adelante).
 
 ---
@@ -141,7 +142,8 @@ Incluir en el **.zip/.rar**: documento general con portada (integrantes, materia
 ## Riesgos
 
 - Definiciones de orden **total** / **estricto**: documentar las que usa el código.
-- **n** grande: grafo ilegible; opcional límite superior o export PNG.
+- **n** muy grande: matriz **n×n** consume mucha RAM; el grafo en Plotly puede volverse lento o ilegible; la entrada manual es impracticable. No se impone tope en código: la responsabilidad es del usuario o de advertencias en el manual (no sustituyen un máximo obligatorio).
+- **PyInstaller** con Plotly puede exigir empaquetar recursos del paquete (p. ej. `--collect-all plotly`); probar el ejecutable en un PC limpio.
 
 ---
 
@@ -151,7 +153,7 @@ Incluir en el **.zip/.rar**: documento general con portada (integrantes, materia
 2. I/O y validación con `**dtype=bool`**.
 3. Propiedades + producto booleano para transitividad.
 4. Órdenes y menú.
-5. Grafo NetworkX + Matplotlib.
+5. Grafo: NetworkX + Plotly.
 6. PyInstaller + pruebas + informe.
 
 ---
@@ -195,13 +197,13 @@ python main.py
 
 ### Uso esperado de la aplicación
 
-1. **Tamaño n:** el programa solicita el número de elementos (orden de la matriz). Debe ser un entero positivo acorde al límite que definas (por ejemplo 1–20 para visualización cómoda).
+1. **Tamaño n:** el programa solicita el orden de la matriz: cualquier entero **n ≥ 1** (sin tope fijo en código). Para uso cómodo en consola y en el visor del grafo, conviene **n** moderado; valores grandes están limitados solo por memoria y tiempo.
 2. **Modo de matriz:** elegir entre **entrada manual** (teclado, fila a fila o celda a celda con **0** o **1**) o **generación aleatoria** con la misma n.
 3. **Validación:** si la matriz no es cuadrada o hay caracteres distintos de 0/1, el programa muestra un mensaje de error y pide corregir sin continuar el análisis incorrectamente.
 4. **Relación R:** la aplicación lista los pares (x_i, x_j) para los que la entrada booleana es verdadera (equivalente a los “unos” del enunciado).
 5. **Análisis:** desde el menú, ejecutar **todas** las comprobaciones de propiedades o **una** propiedad concreta; se muestra **Sí/No** (y opcionalmente un contraejemplo).
 6. **Órdenes:** se indica si la relación es orden parcial, total o estricto según las definiciones documentadas en tu informe académico.
-7. **Grafo:** al elegir la opción correspondiente, se abre una ventana con el **grafo dirigido**: un nodo por elemento; una flecha de i a j si hay **True** en (i,j). Cierra la ventana para volver al menú.
+7. **Grafo:** al elegir la opción correspondiente, se abre la vista interactiva de **Plotly** (habitualmente en el **navegador**) con el **grafo dirigido**: un nodo por elemento; aristas según **True** en (i,j), con indicación de dirección según implementación (trazas + anotaciones). Cierra la pestaña o la ventana del visor y vuelve a la consola.
 
 ### Generar ejecutable (entrega)
 
@@ -211,13 +213,13 @@ Con PyInstaller (ajusta el nombre del script principal):
 pyinstaller --onefile --windowed main.py
 ```
 
-La opción `--windowed` evita consola extra si la UI es solo ventanas; si tu aplicación es **solo consola**, omite `--windowed`. Revisa la carpeta `dist/` para el binario y pruébalo en un equipo **sin** el proyecto ni el IDE.
+La opción `--windowed` evita consola extra si la UI es solo ventanas; si tu aplicación es **solo consola** y Plotly abre el navegador, suele bastar sin `--windowed`. Revisa la carpeta `dist/` y prueba el binario en un equipo **sin** el proyecto ni el IDE; si falla Plotly empaquetado, prueba `--collect-all plotly`.
 
 ### Problemas frecuentes
 
 - `**pip` no encuentra `dependencias`:** ejecuta el comando desde la carpeta donde está el archivo `dependencias` o usa la ruta completa: `pip install -r /ruta/al/proyecto/dependencias`.
-- **Matplotlib no muestra ventana:** en algunos Linux hace falta backend; si ocurre, consulta la documentación de Matplotlib para tu sistema o guarda figura a archivo (`savefig`) como alternativa temporal.
-- **Grafo ilegible con n grande:** reduce **n** o amplía figura (`figsize`) y prueba otro layout (`spring_layout`, `kamada_kawai_layout`).
+- **Plotly no abre el navegador:** revisa `plotly.io.renderers` y la documentación de Plotly para tu SO; asegúrate de tener navegador predeterminado.
+- **Grafo ilegible con n grande:** reduce **n** o ajusta layout en NetworkX (`spring_layout`, `kamada_kawai_layout`) y parámetros de traza Plotly (tamaño de nodo, longitud de arista).
 
 ---
 
@@ -225,6 +227,6 @@ La opción `--windowed` evita consola extra si la UI es solo ventanas; si tu apl
 
 - [Stack Overflow — multiplicación de matrices booleanas en NumPy](https://stackoverflow.com/questions/79106168/best-way-to-calculate-boolean-matrix-multiplication-in-numpy)  
 - [Notas — cierre transitivo y producto booleano (Waterloo CS466)](https://student.cs.uwaterloo.ca/~cs466/Old_courses/F08/transitiveClosure.pdf)  
-- [NetworkX — ejemplo dibujo de grafo dirigido](https://networkx.org/documentation/stable/auto_examples/drawing/plot_directed.html)  
-- [NetworkX — `from_numpy_array](https://networkx.org/documentation/stable/reference/generated/networkx.convert_matrix.from_numpy_array.html)`
+- [Plotly — Python graphing library](https://plotly.com/python/)  
+- [NetworkX — `from_numpy_array`](https://networkx.org/documentation/stable/reference/generated/networkx.convert_matrix.from_numpy_array.html)
 

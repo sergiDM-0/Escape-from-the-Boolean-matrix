@@ -7,10 +7,7 @@ from typing import Literal
 
 import numpy as np
 
-MAX_N = 40
-
-
-def parse_positive_int(text: str, *, max_value: int = MAX_N) -> int:
+def parse_positive_int(text: str) -> int:
     text = text.strip()
     if not text:
         raise ValueError("Entrada vacía.")
@@ -20,8 +17,6 @@ def parse_positive_int(text: str, *, max_value: int = MAX_N) -> int:
         raise ValueError("Debe ser un número entero.") from exc
     if n < 1:
         raise ValueError("n debe ser al menos 1.")
-    if n > max_value:
-        raise ValueError(f"n no puede ser mayor que {max_value}.")
     return n
 
 

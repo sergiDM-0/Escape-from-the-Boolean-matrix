@@ -54,7 +54,7 @@ python main.py
 4. **Relación R:** la aplicación lista los pares \((x_i, x_j)\) para los que la entrada booleana es verdadera (equivalente a los “unos” del enunciado).
 5. **Análisis:** desde el menú, ejecutar **todas** las comprobaciones de propiedades o **una** propiedad concreta; se muestra **Sí/No** (y opcionalmente un contraejemplo).
 6. **Órdenes:** se indica si la relación es orden parcial, total o estricto según las definiciones documentadas en tu informe académico.
-7. **Grafo:** al elegir la opción correspondiente, se abre una ventana con el **grafo dirigido**: un nodo por elemento; una flecha de \(i\) a \(j\) si hay **True** en \((i,j)\). Cierra la ventana para volver al menú.
+7. **Grafo:** al elegir la opción correspondiente, se genera un HTML interactivo con el **grafo dirigido** (con flechas). Si el navegador no se abre automáticamente, abre manualmente `v1.0/grafo_dirigido.html`.
 
 ## Generar ejecutable (entrega)
 
@@ -70,8 +70,8 @@ La opción `--windowed` evita consola extra si la UI es solo ventanas; si tu apl
 ## Problemas frecuentes
 
 - **`pip` no encuentra `dependencias`:** usa la ruta desde la raíz del repo: `pip install -r v1.0/dependencias`.
-- **Matplotlib no muestra ventana:** en algunos Linux hace falta backend; si ocurre, consulta la documentación de Matplotlib para tu sistema o guarda figura a archivo (`savefig`) como alternativa temporal.
-- **Grafo ilegible con n grande:** reduce **n** o amplía figura (`figsize`) y prueba otro layout (`spring_layout`, `kamada_kawai_layout`).
+- **El grafo no se abre:** abre manualmente `v1.0/grafo_dirigido.html`.
+- **Grafo ilegible con n grande:** reduce **n** o usa matriz aleatoria con n moderado (el HTML con muchas aristas se vuelve pesado).
 
 ## Documentación técnica
 
