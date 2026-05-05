@@ -108,7 +108,7 @@ def main_menu(m: np.ndarray) -> str:
     print("  2) Mostrar relación R")
     print("  3) Analizar todas las propiedades y órdenes")
     print("  4) Consultar una propiedad u orden")
-    print("  5) Mostrar grafo dirigido (ventana)")
+    print("  5) Mostrar grafo dirigido (HTML / navegador)")
     print("  6) Ingresar otra matriz")
     print("  0) Salir")
     return input("Opción: ").strip()

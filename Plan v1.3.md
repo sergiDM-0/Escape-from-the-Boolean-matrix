@@ -93,7 +93,7 @@ Archivo: [`v1.0/dependencias`](v1.0/dependencias)
 
 ## Documentación y manual de uso (README)
 
-Manual principal: [`README.md`](README.md)
+Manual de usuario: [`README.md`](README.md) · Lógica técnica del código: [`Plan v1.4.md`](Plan%20v1.4.md)
 
 Puntos clave del uso hoy:
 

@@ -42,26 +42,39 @@ def row_from_tokens(tokens: list[str]) -> np.ndarray:
 
 
 def read_matrix_manual(n: int) -> np.ndarray:
-    print(f"Ingrese la matriz {n}×{n}, una fila por línea.")
-    print("Cada fila: {n} valores separados por espacio (solo 0 o 1).".format(n=n))
-    rows: list[np.ndarray] = []
+    print(f"Ingrese la matriz {n}×{n} celda por celda (solo 0 o 1).")
+    print("Se pedirá cada posición (fila, columna).")
+
+    m = np.zeros((n, n), dtype=bool)
+    total = n * n
+    filled = 0
+    asked_assist = False
+
     for i in range(n):
-        while True:
-            line = input(f"Fila {i + 1}/{n}: ").strip()
-            if not line:
-                print("Línea vacía; reintente.")
-                continue
-            tokens = line.split()
-            if len(tokens) != n:
-                print(f"Se esperaban {n} valores; obtuvo {len(tokens)}. Reintente.")
-                continue
-            try:
-                rows.append(row_from_tokens(tokens))
-            except ValueError as e:
-                print(e)
-                continue
-            break
-    return np.vstack(rows)
+        for j in range(n):
+            remaining = total - filled
+            prompt = f"Valor en posición (fila {i + 1}, columna {j + 1}) [faltan {remaining}]: "
+
+            while True:
+                raw = input(prompt).strip()
+                if raw not in ("0", "1"):
+                    print("Solo se permiten 0 y 1 en cada celda.")
+                    continue
+                m[i, j] = raw == "1"
+                filled += 1
+                break
+
+            if filled == 2 and not asked_assist and total > 2:
+                asked_assist = True
+                ans = input("si se canso puedo completarlo por usted y que sera y o n: ").strip().lower()
+                if ans == "y":
+                    for ii in range(i, n):
+                        jj_start = j + 1 if ii == i else 0
+                        for jj in range(jj_start, n):
+                            m[ii, jj] = random.choice((False, True))
+                    return m
+
+    return m
 
 
 def random_matrix(n: int, *, seed: int | None = None) -> np.ndarray:
