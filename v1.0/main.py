@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 import sys
 
 import numpy as np
@@ -13,6 +14,17 @@ import matrix_view
 import order as order_mod
 import relation
 import relation_view
+
+
+def cleanup_generated_html() -> None:
+    """Elimina HTML generado para no ensuciar el repo."""
+    base = Path(__file__).resolve().parent
+    for name in ("matriz_relacional.html", "relacion_R.html", "grafo_dirigido.html"):
+        try:
+            (base / name).unlink(missing_ok=True)
+        except Exception:
+            # No bloquea la salida del programa si el SO niega permisos, etc.
+            pass
 
 
 def print_matrix(m: np.ndarray) -> None:
@@ -117,37 +129,40 @@ def main_menu(m: np.ndarray) -> str:
 def run() -> None:
     print("=== Matemáticas discretas — Matriz relacional y grafo ===\n")
     m = load_matrix()
-    while True:
-        opt = main_menu(m)
-        if opt == "0":
-            print("Fin.")
-            return
-        if opt == "1":
-            print("\nMatriz MR:")
-            print_matrix(m)
-            try:
-                matrix_view.show_matrix_html(m)
-            except Exception as e:  # noqa: BLE001
-                print(f"No se pudo mostrar la matriz en HTML: {e}")
-        elif opt == "2":
-            print("\n" + relation.format_relation_r(m))
-            try:
-                relation_view.show_relation_html(m)
-            except Exception as e:  # noqa: BLE001
-                print(f"No se pudo mostrar la relación en HTML: {e}")
-        elif opt == "3":
-            print_all_properties(m)
-        elif opt == "4":
-            property_menu(m)
-        elif opt == "5":
-            try:
-                graph_view.show_directed_graph(m)
-            except Exception as e:  # noqa: BLE001 — UI/backend varía por SO
-                print(f"No se pudo mostrar el grafo: {e}")
-        elif opt == "6":
-            m = load_matrix()
-        else:
-            print("Opción no válida.")
+    try:
+        while True:
+            opt = main_menu(m)
+            if opt == "0":
+                print("Fin.")
+                return
+            if opt == "1":
+                print("\nMatriz MR:")
+                print_matrix(m)
+                try:
+                    matrix_view.show_matrix_html(m)
+                except Exception as e:  # noqa: BLE001
+                    print(f"No se pudo mostrar la matriz en HTML: {e}")
+            elif opt == "2":
+                print("\n" + relation.format_relation_r(m))
+                try:
+                    relation_view.show_relation_html(m)
+                except Exception as e:  # noqa: BLE001
+                    print(f"No se pudo mostrar la relación en HTML: {e}")
+            elif opt == "3":
+                print_all_properties(m)
+            elif opt == "4":
+                property_menu(m)
+            elif opt == "5":
+                try:
+                    graph_view.show_directed_graph(m)
+                except Exception as e:  # noqa: BLE001 — UI/backend varía por SO
+                    print(f"No se pudo mostrar el grafo: {e}")
+            elif opt == "6":
+                m = load_matrix()
+            else:
+                print("Opción no válida.")
+    finally:
+        cleanup_generated_html()
 
 
 if __name__ == "__main__":
@@ -155,4 +170,5 @@ if __name__ == "__main__":
         run()
     except KeyboardInterrupt:
         print("\nInterrumpido.")
+        cleanup_generated_html()
         sys.exit(130)
