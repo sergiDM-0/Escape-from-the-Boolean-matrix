@@ -28,5 +28,5 @@ python v1.0/main.py
 | `matrix_io.py`  | Entrada manual (0/1) o matriz aleatoria, validación   |
 | `relation.py`   | Propiedades de la relación (bool / NumPy)             |
 | `order.py`      | Orden parcial, total y estricto                       |
-| `graph_view.py` | Grafo dirigido con NetworkX + Matplotlib              |
+| `graph_view.py` | Grafo dirigido con NetworkX + Plotly (HTML)           |
 | `dependencias`  | Paquetes pip (instalar con `-r v1.0/dependencias` desde la raíz) |

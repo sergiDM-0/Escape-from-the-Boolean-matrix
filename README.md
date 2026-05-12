@@ -29,8 +29,13 @@ Aplicativo en **consola (Python 3)** que trabaja con una **matriz relacional** *
 | [`v1.0/graph_view.py`](v1.0/graph_view.py) | HTML del grafo dirigido |
 | [`v1.0/html_export.py`](v1.0/html_export.py) | Guardar/abrir HTML auxiliar |
 | [`v1.0/dependencias`](v1.0/dependencias) | Lista para `pip install -r` |
+| [`v1.0/README.md`](v1.0/README.md) | Resumen corto de ejecución desde la carpeta `v1.0/` |
+| [`qa/TEST_PLAN.md`](qa/TEST_PLAN.md) | Plan de QA: riesgos, casos manuales y comprobaciones recomendadas |
+| [`LICENSE`](LICENSE) | Licencia del repositorio |
 
 Los archivos **`matriz_relacional.html`**, **`relacion_R.html`** y **`grafo_dirigido.html`** se crean o sobrescriben dentro de **`v1.0/`** cuando usas las opciones correspondientes del menú.
+
+En la raíz existen además borradores o versiones anteriores del plan técnico (`Plan v1.0.md` … `Plan v1.3.md`); la referencia canónica para la implementación actual es **[Plan v1.4.md](Plan%20v1.4.md)**.
 
 ---
 
@@ -266,6 +271,8 @@ En la carpeta [`qa/`](qa/):
 | [`qa/smoke_tests.py`](qa/smoke_tests.py) | Comprobaciones básicas de propiedades y entrada manual simulada |
 | [`qa/phase2_tests.py`](qa/phase2_tests.py) | Entradas inválidas, autocompletado, generación de HTML |
 
+Para criterios de aceptación, riesgos y **pruebas manuales** recomendadas, consulta además [`qa/TEST_PLAN.md`](qa/TEST_PLAN.md).
+
 Ejecución (raíz del repo, con `.venv` activada):
 
 ```bash
@@ -304,9 +311,188 @@ Este repositorio **no** incluye el ejecutable ya construido; debes generarlo ant
 
 Para **cómo están implementadas** las funciones, el producto booleano, la transitividad y el pipeline del grafo Plotly, lee **[Plan v1.4.md](Plan%20v1.4.md)**.
 
-### Referencias útiles (implementación)
+### Inventario técnico (todo lo que interviene en el código)
 
-- [Stack Overflow — multiplicación booleana en NumPy](https://stackoverflow.com/questions/79106168/best-way-to-calculate-boolean-matrix-multiplication-in-numpy)  
-- [Waterloo — transitividad y producto booleano (PDF)](https://student.cs.uwaterloo.ca/~cs466/Old_courses/F08/transitiveClosure.pdf)  
-- [NetworkX — `from_numpy_array`](https://networkx.org/documentation/stable/reference/generated/networkx.convert_matrix.from_numpy_array.html)  
-- [Plotly — Python](https://plotly.com/python/)
+| Área | Qué se usa | Dónde (principalmente) |
+|------|-------------|-------------------------|
+| **Python 3** | Sintaxis, consola, `if`/`for`/`while`, f-strings, `try`/`except`/`finally` | Todo `v1.0/*.py`, `qa/*.py` |
+| **`from __future__ import annotations`** | Anotaciones de tipos pospuestas | Todos los `.py` del proyecto |
+| **`pathlib.Path`** | Rutas a HTML, `unlink`, `write_text`, `exists`, `resolve`, `parent`, `as_uri` | [`v1.0/main.py`](v1.0/main.py), [`v1.0/html_export.py`](v1.0/html_export.py), [`v1.0/graph_view.py`](v1.0/graph_view.py), [`qa/phase2_tests.py`](qa/phase2_tests.py) |
+| **`sys`** | `sys.path.insert`, `sys.exit(130)` tras `KeyboardInterrupt` | [`v1.0/main.py`](v1.0/main.py), `qa/*.py` |
+| **`builtins.input` / `print`** | Menú, prompts, matriz manual | [`v1.0/main.py`](v1.0/main.py), [`v1.0/matrix_io.py`](v1.0/matrix_io.py) |
+| **`random`** | `seed`, `choice` (matriz aleatoria y autocompletado) | [`v1.0/matrix_io.py`](v1.0/matrix_io.py) |
+| **`typing.Literal`** | Modo de matriz acotado a cadenas `"manual"` o `"random"` en `acquire_matrix` | [`v1.0/matrix_io.py`](v1.0/matrix_io.py) |
+| **`Exception` / `ValueError` / `KeyboardInterrupt` / `ModuleNotFoundError`** | Validación de entrada, salida limpia; en el grafo, ausencia opcional de SciPy (`graph_view`) | [`v1.0/main.py`](v1.0/main.py), [`v1.0/matrix_io.py`](v1.0/matrix_io.py), [`v1.0/graph_view.py`](v1.0/graph_view.py) |
+| **`webbrowser`** | Abrir HTML en el navegador (`open`, `as_uri`) | [`v1.0/html_export.py`](v1.0/html_export.py), [`v1.0/graph_view.py`](v1.0/graph_view.py); parche en pruebas |
+| **Pruebas (stdlib)** | `io.StringIO`, `contextlib.redirect_stdout`, `os.environ.setdefault`, sustitución de `builtins.input` | [`qa/phase2_tests.py`](qa/phase2_tests.py), [`qa/smoke_tests.py`](qa/smoke_tests.py) |
+| **HTML estático** | `<!doctype html>`, `<meta charset="utf-8">`, CSS en línea (relación vacía **R = ∅**) | [`v1.0/relation_view.py`](v1.0/relation_view.py) |
+| **NumPy** | `ndarray` `dtype=bool`, `zeros`, `eye`, `asarray`, `diag`, transpuesta `.T`, operadores booleanos elemento a elemento (`&`, OR con barra vertical de Python, `~`), `all`, `any`, `matmul`, `astype`, `hypot`, `sqrt`, `shape` | [`v1.0/relation.py`](v1.0/relation.py), [`v1.0/matrix_io.py`](v1.0/matrix_io.py), [`v1.0/order.py`](v1.0/order.py), vistas, `main`, `qa` |
+| **NetworkX** | `DiGraph`, `from_numpy_array`, `.edges()`, `spring_layout`, `circular_layout` | [`v1.0/graph_view.py`](v1.0/graph_view.py) |
+| **Plotly** | `graph_objects.Figure`, `Table`, `Scatter`, `to_html(full_html=..., include_plotlyjs="cdn")`, `write_html`, `update_layout`, anotaciones con `showarrow` | [`v1.0/matrix_view.py`](v1.0/matrix_view.py), [`v1.0/relation_view.py`](v1.0/relation_view.py), [`v1.0/graph_view.py`](v1.0/graph_view.py) |
+| **SciPy** | *No* está en `dependencias`; solo aparece si NetworkX intenta usarlo en `spring_layout` | [`v1.0/graph_view.py`](v1.0/graph_view.py) |
+| **PyInstaller** | Empaquetado opcional del ejecutable | README §11, [`v1.0/dependencias`](v1.0/dependencias) |
+| **Matemática (lógica en código)** | Matriz relacional 0/1, propiedades de **R**, producto booleano **M²**, orden parcial/total/estricto, digrafo desde MR | [`v1.0/relation.py`](v1.0/relation.py), [`v1.0/order.py`](v1.0/order.py) |
+| **Enunciado y plan (repo)** | PDF del curso; documentación de implementación | [`Proyecto_Final_M.D..pdf`](Proyecto_Final_M.D..pdf), [`Plan v1.4.md`](Plan%20v1.4.md) |
+| **Scripts QA** | Comprobaciones manuales con `assert` (sin framework de test externo) | [`qa/smoke_tests.py`](qa/smoke_tests.py), [`qa/phase2_tests.py`](qa/phase2_tests.py) |
+
+Los paquetes declarados en [`v1.0/dependencias`](v1.0/dependencias) son: **numpy**, **networkx**, **plotly**, **pyinstaller** (con rangos de versión allí indicados).
+
+### API por archivo (funciones y puntos de entrada)
+
+Listado de **def** a nivel de módulo en `v1.0/` y en `qa/`, en el orden en que suelen leerse los módulos. No hay `__all__`: en Python todo lo de nivel superior es importable; lo marcado como “interno” en QA es por convención de nombre (`_`).
+
+#### [`v1.0/main.py`](v1.0/main.py)
+
+| Función | Rol breve |
+|---------|-----------|
+| `cleanup_generated_html()` | Borra los tres HTML generados en la carpeta del script al salir o al interrumpir. |
+| `print_matrix(m)` | Imprime la matriz en consola como `0`/`1` separados por espacios. |
+| `prompt_n()` | Bucle hasta obtener un entero **n** ≥ 1 válido (`matrix_io.parse_positive_int`). |
+| `prompt_mode()` | Devuelve `("manual", None)` o `("random", semilla_o_None)` según menú 1/2. |
+| `load_matrix()` | Pide **n** y modo, devuelve `np.ndarray` bool cuadrado (`matrix_io.acquire_matrix`). |
+| `print_all_properties(m)` | Opción menú 3: propiedades de **R**, equivalencia y órdenes. |
+| `property_menu(m)` | Opción menú 4: submenú de una sola propiedad u orden. |
+| `main_menu(m)` | Muestra menú principal y devuelve la cadena de opción. |
+| `run()` | Bucle del programa: menú, ramas 0–6, limpieza HTML en `finally`. |
+
+**Punto de entrada:** `if __name__ == "__main__"` llama a `run()`; ante `KeyboardInterrupt` imprime mensaje, ejecuta `cleanup_generated_html()` y `sys.exit(130)`.
+
+#### [`v1.0/matrix_io.py`](v1.0/matrix_io.py)
+
+| Función | Rol breve |
+|---------|-----------|
+| `parse_positive_int(text)` | Valida texto → entero ≥ 1 o `ValueError`. |
+| `ensure_square_bool_matrix(m)` | Comprueba matriz 2D cuadrada; devuelve copia `bool` o `ValueError`. |
+| `row_from_tokens(tokens)` | Convierte una lista de tokens `0`/`1` en un `ndarray` bool de forma `(1, n)` (helper del módulo; el flujo manual actual no la llama). |
+| `read_matrix_manual(n)` | Entrada celda a celda, mensaje de ayuda tras la segunda celda si aplica. |
+| `random_matrix(n, *, seed=None)` | Matriz **n×n** aleatoria `bool`; opcionalmente fija `random.seed`. |
+| `acquire_matrix(mode, n, *, random_seed=None)` | `mode` ∈ `Literal["manual","random"]`; devuelve matriz cuadrada bool validada. |
+
+#### [`v1.0/relation.py`](v1.0/relation.py)
+
+| Función | Rol breve |
+|---------|-----------|
+| `node_label(i)` | Índice 0-based → cadena `x_{i+1}` (subíndice en consola como `x_1`, etc.). |
+| `pairs_from_matrix(m)` | Lista de pares `(x_i, x_j)` donde `m[i,j]` es verdadero. |
+| `format_relation_r(m)` | Cadena `R = { ... }` o `R = ∅`. |
+| `is_reflexive(m)` | Diagonal toda verdadera. |
+| `is_irreflexive(m)` | Diagonal toda falsa. |
+| `is_symmetric(m)` | **M** igual a **M** transpuesta. |
+| `is_asymmetric(m)` | Ningún par simétrico fuera de la diagonal; implica irreflexiva. |
+| `is_antisymmetric(m)` | No hay **i≠j** con **M[i,j]** y **M[j,i]** simultáneos. |
+| `boolean_square(m)` | Producto booleano **M∘M** vía `np.matmul(m, m)`. |
+| `is_transitive(m)` | **M²** implica **M** entrada a entrada. |
+| `is_equivalence(m)` | Reflexiva ∧ simétrica ∧ transitiva. |
+| `transitive_counterexample(m)` | Primer contraejemplo textual para transitividad, o `None`. |
+
+#### [`v1.0/order.py`](v1.0/order.py)
+
+| Función | Rol breve |
+|---------|-----------|
+| `is_partial_order(m)` | Reflexiva ∧ antisimétrica ∧ transitiva. |
+| `is_total_order(m)` | Orden parcial ∧ comparabilidad para todo **i≠j**. |
+| `is_strict_order(m)` | Irreflexiva ∧ asimétrica ∧ transitiva. |
+
+#### [`v1.0/html_export.py`](v1.0/html_export.py)
+
+| Función | Rol breve |
+|---------|-----------|
+| `write_and_open_html(*, filename, html)` | Escribe UTF-8 en `v1.0/<filename>`, intenta `webbrowser.open`, devuelve `Path`. |
+
+#### [`v1.0/matrix_view.py`](v1.0/matrix_view.py)
+
+| Función | Rol breve |
+|---------|-----------|
+| `show_matrix_html(m)` | `go.Table` + `to_html(..., include_plotlyjs="cdn")` → `matriz_relacional.html`. |
+
+#### [`v1.0/relation_view.py`](v1.0/relation_view.py)
+
+| Función | Rol breve |
+|---------|-----------|
+| `show_relation_html(m)` | Si **R** vacío, HTML estático; si no, `go.Table` → `relacion_R.html`. |
+
+#### [`v1.0/graph_view.py`](v1.0/graph_view.py)
+
+| Función | Rol breve |
+|---------|-----------|
+| `show_directed_graph(m)` | Digrafo con NetworkX + trazas Plotly + anotaciones con flechas → `grafo_dirigido.html` (`write_html` + intento de abrir navegador). |
+
+#### [`qa/smoke_tests.py`](qa/smoke_tests.py)
+
+| Símbolo | Rol breve |
+|---------|-----------|
+| `test_core_properties()` | Matrices fijas: equivalencia, transitividad, orden estricto, etc. |
+| `test_manual_entry_cell_by_cell()` | Simula `input` para matriz manual 2×2. |
+| `test_manual_entry_assisted_complete()` | Simula autocompletado con respuesta `y` en 3×3. |
+| `main()` | Ejecuta las pruebas anteriores e imprime éxito. |
+
+**Punto de entrada:** `if __name__ == "__main__"` → `main()`.
+
+#### [`qa/phase2_tests.py`](qa/phase2_tests.py)
+
+| Símbolo | Rol breve |
+|---------|-----------|
+| `ROOT`, `V1` | Rutas absolutas a la raíz del repo y a `v1.0/` (para comprobar existencia de HTML). |
+| `_fake_inputs(seq)` | Fábrica de `input` que devuelve valores de `seq` en orden (uso interno del test). |
+| `test_parse_positive_int_invalids()` | Entradas inválidas a `parse_positive_int`. |
+| `test_manual_cell_reprompts_on_invalid_cell()` | Reintentos de celda + pregunta de ayuda `n`. |
+| `test_manual_assist_answer_other_than_y_keeps_asking()` | Respuesta distinta de `y` tras la ayuda. |
+| `test_html_generation_creates_files()` | Genera los tres HTML con `webbrowser.open` mockeado. |
+| `main()` | Fija `PYTHONIOENCODING` si hace falta y lanza todas las pruebas. |
+
+**Punto de entrada:** `if __name__ == "__main__"` → `main()`.
+
+---
+
+### Referencias útiles (implementación, matrices booleanas y apoyo)
+
+#### Matrices booleanas, producto booleano y transitividad
+
+- [Wikipedia — matriz lógica / booleana (*logical matrix*)](https://en.wikipedia.org/wiki/Logical_matrix) (enlace con la idea de matriz 0/1 y composición de relaciones).  
+- [Wikipedia — matriz de adyacencia (incluye grafos dirigidos)](https://en.wikipedia.org/wiki/Adjacency_matrix) (MR como matriz de un digrafo).  
+- [Stack Overflow — multiplicación booleana en NumPy](https://stackoverflow.com/questions/79106168/best-way-to-calculate-boolean-matrix-multiplication-in-numpy) (relacionado con `np.matmul` sobre `bool` en [`v1.0/relation.py`](v1.0/relation.py)).  
+- [Waterloo — transitividad y cierre transitivo / producto booleano (PDF)](https://student.cs.uwaterloo.ca/~cs466/Old_courses/F08/transitiveClosure.pdf)  
+- [NumPy — `matmul`](https://numpy.org/doc/stable/reference/generated/numpy.matmul.html) y [tipos escalares / booleanos](https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.bool).  
+- [NumPy — indexación y formas de array](https://numpy.org/doc/stable/user/basics.indexing.html) (filas/columnas 0-based en código vs etiquetas **x₁…xₙ** en salida).
+
+#### Biblioteca estándar de Python (lo que importa el proyecto)
+
+- [`pathlib`](https://docs.python.org/3/library/pathlib.html) · [`sys`](https://docs.python.org/3/library/sys.html) · [`random`](https://docs.python.org/3/library/random.html) · [`typing.Literal`](https://docs.python.org/3/library/typing.html#typing.Literal) · [`webbrowser`](https://docs.python.org/3/library/webbrowser.html) · [`builtins`](https://docs.python.org/3/library/builtins.html) (sustitución de `input` en pruebas) · [`io.StringIO`](https://docs.python.org/3/library/io.html#io.StringIO) · [`contextlib.redirect_stdout`](https://docs.python.org/3/library/contextlib.html#contextlib.redirect_stdout) · [`os.environ`](https://docs.python.org/3/library/os.html#os.environ) · [Excepciones integradas](https://docs.python.org/3/library/exceptions.html) (`ValueError`, `KeyboardInterrupt`, `ModuleNotFoundError`).  
+- [PEP 563 — *Postponed Evaluation of Annotations*](https://peps.python.org/pep-0563/) (`from __future__ import annotations`).  
+- [**Entorno virtual `venv`**](https://docs.python.org/3/library/venv.html) y [**pip (guía de usuario)**](https://pip.pypa.io/en/stable/user_guide/) — alineados con las secciones 3–4 de este README (no son `import` en el código, pero sí herramientas usadas para ejecutar el proyecto).
+
+#### NetworkX, grafos dirigidos y layouts
+
+- [`networkx.from_numpy_array`](https://networkx.org/documentation/stable/reference/generated/networkx.convert_matrix.from_numpy_array.html) · [`DiGraph`](https://networkx.org/documentation/stable/reference/classes/digraph.html) · [Dibujo — `spring_layout`, `circular_layout`](https://networkx.org/documentation/stable/reference/drawing.html) (uso en [`v1.0/graph_view.py`](v1.0/graph_view.py)).
+
+#### Plotly y HTML generado
+
+- [Plotly Python — `graph_objects`](https://plotly.com/python/graph-objects/) · [Tablas (`go.Table`)](https://plotly.com/python/table/) · [`Figure.to_html`](https://plotly.com/python-api-reference/generated/plotly.graph_objects.Figure.html#plotly.graph_objects.Figure.to_html) (incluye `include_plotlyjs="cdn"` en tablas) · [`Figure.write_html`](https://plotly.com/python-api-reference/generated/plotly.graph_objects.Figure.html#plotly.graph_objects.Figure.write_html) (grafo).  
+- [Anotaciones y flechas](https://plotly.com/python/text-and-annotations/) (`showarrow`, cabeza de flecha en aristas).  
+- [MDN — HTML básico y `meta charset`](https://developer.mozilla.org/en-US/docs/Web/HTML/Guides) (referencia para el HTML manual de [`v1.0/relation_view.py`](v1.0/relation_view.py)).
+
+#### SciPy (opcional, solo si NetworkX lo pide)
+
+- [SciPy — documentación](https://docs.scipy.org/doc/scipy/) (instalación opcional para algunos caminos de `spring_layout`).  
+- [Foro Scientific Python](https://discuss.scientific-python.org/).
+
+#### PyInstaller
+
+- [Manual de PyInstaller](https://pyinstaller.org/en/stable/) (sección 11 del README; flags como `--collect-all plotly`).
+
+#### Teoría: relaciones, órdenes y grafos
+
+- [**Mathematics Stack Exchange — relaciones**](https://math.stackexchange.com/questions/tagged/relations) · [**grafos**](https://math.stackexchange.com/questions/tagged/graph-theory) · [**relaciones de orden**](https://math.stackexchange.com/questions/tagged/order-theory) (definiciones y contraejemplos).  
+- [Wikipedia — relación binaria](https://en.wikipedia.org/wiki/Binary_relation) (reflexiva, simétrica, transitiva, etc.).  
+- [Wikipedia — orden parcial](https://en.wikipedia.org/wiki/Partially_ordered_set) (contrastar con [`v1.0/order.py`](v1.0/order.py)).
+
+#### Foros y comunidades (preguntas concretas, errores de entorno, versiones)
+
+- [**Discuss Python**](https://discuss.python.org/) — `venv`, `pip`, versiones de Python.  
+- [**Stack Overflow — `python`**](https://stackoverflow.com/questions/tagged/python) — consola, `pathlib`, `webbrowser`, `random`.  
+- [**Stack Overflow — `numpy`**](https://stackoverflow.com/questions/tagged/numpy) — matrices `bool`, `matmul`, indexación.  
+- [**Stack Overflow — búsqueda «numpy boolean matrix»**](https://stackoverflow.com/search?q=numpy+boolean+matrix) — producto booleano, máscaras y tipos.  
+- [**Stack Overflow — `networkx`**](https://stackoverflow.com/questions/tagged/networkx) — digrafos, adyacencia, layouts, *“No module named scipy”*.  
+- [**Discusiones NetworkX (GitHub)**](https://github.com/networkx/networkx/discussions).  
+- [**Comunidad Plotly (Python)**](https://community.plotly.com/c/python/6) — HTML, tablas, flechas, rendimiento.  
+- [**Discusiones PyInstaller (GitHub)**](https://github.com/pyinstaller/pyinstaller/discussions).

@@ -15,7 +15,7 @@ import order as order_mod
 import relation
 import relation_view
 
-
+#Funcion para eliminar los archivos HTML generados
 def cleanup_generated_html() -> None:
     """Elimina HTML generado para no ensuciar el repo."""
     base = Path(__file__).resolve().parent
@@ -25,6 +25,7 @@ def cleanup_generated_html() -> None:
         except Exception:
             # No bloquea la salida del programa si el SO niega permisos, etc.
             pass
+
 
 
 def print_matrix(m: np.ndarray) -> None:
@@ -98,6 +99,7 @@ def property_menu(m: np.ndarray) -> None:
         ("9", "Orden total", order_mod.is_total_order),
         ("10", "Orden estricto", order_mod.is_strict_order),
     ]
+    
     print("\nPropiedad a consultar:")
     for key, name, _ in opts:
         print(f"  {key}) {name}")
